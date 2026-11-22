@@ -7,7 +7,7 @@
 Нужны Docker Desktop и Git. Проект и данные находятся в приватном GitHub-репозитории; публичный Docker-образ данных не содержит.
 
 ```bash
-git clone git@github.com:fomik2/fitness.git
+git clone git@github.com:vsfomin/fitness.git
 cd fitness
 docker compose up -d --build app
 ```
@@ -33,7 +33,7 @@ docker compose logs tunnel
 
 ## Облачная копия
 
-`tools/cloud_sync.sh` добавляет в Git все изменения кода и папки `data`, создаёт коммит и отправляет его в приватный репозиторий `git@github.com:fomik2/fitness.git`. На основном Mac команда запускается автоматически каждую минуту через LaunchAgent.
+`tools/cloud_sync.sh` добавляет в Git все изменения кода и папки `data`, создаёт коммит и отправляет его в приватный репозиторий `git@github.com:vsfomin/fitness.git`. На основном Mac команда запускается автоматически каждую минуту через LaunchAgent.
 
 Проверить вручную:
 
