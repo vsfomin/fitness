@@ -1,4 +1,9 @@
 {
+  "values": {
+    "chest": 24,
+    "quad": 5,
+    "rdelt": 1
+  },
   "dismiss": {
     "bi": 4,
     "calf": 1,
@@ -6,10 +11,9 @@
     "hams": 1,
     "mdelt": 1,
     "quad": 1,
-    "rdelt": 1,
+    "rdelt": 6,
     "tri": 5
   },
-  "scale": {},
   "sched": {
     "g:quad": {
       "L": 5,
@@ -21,9 +25,5 @@
       ]
     }
   },
-  "values": {
-    "chest": 24,
-    "quad": 5,
-    "rdelt": 1
-  }
+  "scale": {}
 }

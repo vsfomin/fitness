@@ -13,7 +13,9 @@
       "d2_ohc",
       "d2_ic",
       "d2_rf",
-      "d2_db"
+      "d2_db",
+      "umwrx1h0i4",
+      "umwrx1h0i4"
     ],
     "3": [
       "d3_curl",
@@ -45,27 +47,6 @@
     "d2_mach": false,
     "d3_hack": false
   },
-  "extra": {
-    "umv2datqqi": {
-      "base": "lib:scurl1",
-      "day": "1"
-    }
-  },
-  "hidden": {
-    "d2_mach": true,
-    "d3_ext": true,
-    "d3_lat": true,
-    "d4_lat": true,
-    "d4_pov": true,
-    "d5_ur": true
-  },
-  "links": {
-    "d1_calf": true,
-    "d2_pull": true,
-    "d5_pull": true,
-    "d5_sc": true,
-    "d5_te": true
-  },
   "wStep": {
     "d1_main": 5,
     "d2_rf": 2,
@@ -76,5 +57,30 @@
     "d5_dm": 2,
     "d5_rf": 2,
     "d5_sc": 2
+  },
+  "links": {
+    "d1_calf": true,
+    "d2_pull": true,
+    "d5_pull": true,
+    "d5_sc": true,
+    "d5_te": true
+  },
+  "extra": {
+    "umv2datqqi": {
+      "base": "lib:scurl1",
+      "day": "1"
+    },
+    "umwrx1h0i4": {
+      "base": "d1_pendx",
+      "day": "2"
+    }
+  },
+  "hidden": {
+    "d2_mach": true,
+    "d3_ext": true,
+    "d3_lat": true,
+    "d4_lat": true,
+    "d4_pov": true,
+    "d5_ur": true
   }
 }
