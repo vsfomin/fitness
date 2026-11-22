@@ -4,6 +4,7 @@ let code = cut("/* ---------- program ---------- */", "/* ---------- render ----
 code = code.replace(/^const /gm,'var ').replace(/^let /gm,'var ');
 eval(code + `
 state.growth = {}; state.dismiss = {}; state.sched = {}; state.scale = {}; state.body = [{date:'2026-10-10', weight:100}];
+if (twinsOf('d1_calf').includes('d3_calf') || twinsOf('d3_calf').includes('d1_calf')) throw new Error('Икры дней 1 и 3 должны быть независимы');
 const sessions = []; let t = parseYmd('2026-10-12'); const N = +(process.argv[2] || 23);
 const log = {};
 for (let cycle = 1; cycle <= N; cycle++){
