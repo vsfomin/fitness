@@ -1,0 +1,17 @@
+services:
+  app:
+    build: .
+    ports:
+      - "127.0.0.1:18080:8080"
+    volumes:
+      - ./data:/data
+      - ./tools/db:/seed:ro
+    restart: unless-stopped
+
+  tunnel:
+    image: cloudflare/cloudflared:2026.7.1
+    command: tunnel --no-autoupdate --protocol http2 --url http://app:8080
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped

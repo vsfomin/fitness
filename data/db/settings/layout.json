@@ -1,0 +1,80 @@
+{
+  "days": {
+    "1": [
+      "d1_curl",
+      "d1_main",
+      "d1_lp",
+      "d1_calf",
+      "umv2datqqi"
+    ],
+    "2": [
+      "d2_pull",
+      "d2_incl",
+      "d2_ohc",
+      "d2_ic",
+      "d2_rf",
+      "d2_db"
+    ],
+    "3": [
+      "d3_curl",
+      "d3_bulg",
+      "d3_hack",
+      "d3_calf"
+    ],
+    "4": [
+      "d4_tbar",
+      "d2_flat",
+      "d4_row",
+      "d4_shrug",
+      "d4_dipbw",
+      "d4_push",
+      "d4_ham"
+    ],
+    "5": [
+      "d5_pull",
+      "d5_cl",
+      "d5_mach",
+      "d5_te",
+      "d5_dm",
+      "d5_sc",
+      "d4_fr",
+      "d5_rf"
+    ]
+  },
+  "deloadOv": {
+    "d2_mach": false,
+    "d3_hack": false
+  },
+  "extra": {
+    "umv2datqqi": {
+      "base": "lib:scurl1",
+      "day": "1"
+    }
+  },
+  "hidden": {
+    "d2_mach": true,
+    "d3_ext": true,
+    "d3_lat": true,
+    "d4_lat": true,
+    "d4_pov": true,
+    "d5_ur": true
+  },
+  "links": {
+    "d1_calf": true,
+    "d2_pull": true,
+    "d5_pull": true,
+    "d5_sc": true,
+    "d5_te": true
+  },
+  "wStep": {
+    "d1_main": 5,
+    "d2_rf": 2,
+    "d2_sc": 2,
+    "d3_hack": 10,
+    "d4_push": 2.3,
+    "d5_cl": 2.3,
+    "d5_dm": 2,
+    "d5_rf": 2,
+    "d5_sc": 2
+  }
+}

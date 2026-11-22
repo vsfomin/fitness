@@ -1,0 +1,29 @@
+{
+  "dismiss": {
+    "bi": 4,
+    "calf": 1,
+    "chest": 4,
+    "hams": 1,
+    "mdelt": 1,
+    "quad": 1,
+    "rdelt": 1,
+    "tri": 5
+  },
+  "scale": {},
+  "sched": {
+    "g:quad": {
+      "L": 5,
+      "blocks": [
+        {
+          "L": 5,
+          "start": 1
+        }
+      ]
+    }
+  },
+  "values": {
+    "chest": 24,
+    "quad": 5,
+    "rdelt": 1
+  }
+}
