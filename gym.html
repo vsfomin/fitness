@@ -783,7 +783,7 @@ function renderHeader(){
   const tabs = $('#tabs'); tabs.innerHTML = '';
   const rows = [
     ['days', TABS.map(t => ({key:t.key, html:`День ${t.key}<small>${t.short}</small>`}))],
-    ['more', [{key:'plan', html:'План'}, {key:'stats', html:'Графики'}, {key:'food', html:'Питание'}, {key:'body', html:'Вес и талия'}, {key:'notes', html:'Заметки'}, {key:'rules', html:'Правила'}]],
+    ['more', [{key:'plan', html:'План'}, {key:'stats', html:'Графики'}, {key:'rules', html:'Правила'}]],
   ];
   for (const [cls, list] of rows){
     const row = document.createElement('div'); row.className = 'tabrow ' + cls;
@@ -803,10 +803,7 @@ function render(){
   const main = $('#main'); main.innerHTML = '';
   if (isDay(state.tab)) renderDay(main, state.tab);
   else if (state.tab === 'plan') renderPlan(main);
-  else if (state.tab === 'notes') renderNotes(main);
   else if (state.tab === 'stats') renderStats(main);
-  else if (state.tab === 'food') renderFood(main);
-  else if (state.tab === 'body') renderBody(main);
   else renderRules(main);
 }
 function renderDay(main, key){
@@ -2474,34 +2471,11 @@ function renderStats(main){
       p2.insertAdjacentHTML('beforeend', `<p class="note" style="color:var(--fg);font-weight:600">Рабочий вес${c.bw ? ' (добавка на поясе)' : ''} — самый тяжёлый подход, ${isPlates({id: c.base}) ? 'номер плитки' : 'кг'}</p>` + (linesW.length > 1 ? keysHtml(linesW.map(l => ({name: l.name, color: l.color, dashed: l.dashed})), true) : ''));
       p2.appendChild(buildChart({kind:'line', fitY: true, marks: tmk, title:'Рабочий вес: план и факт', width, x0, x1, xticks: xt, lines: linesW, fmtY: v => fmtW(Math.round(v * 10) / 10), fmtV: v => wTxt({id: c.base}, v)}));
     }
-    p2.insertAdjacentHTML('beforeend', `<p class="note">Пунктир — план (тем же цветом, что и факт): что приложение предлагало на прошедшие тренировки и что предложит на ближайшие микроциклы (от твоего факта). ${c.bw ? 'В объём подтягиваний входит твой вес тела из вкладки «Вес и талия». ' : ''}${c.split ? 'Диапазоны 6–8 и 10–12 — отдельные линии факта.' : ''}${tempoOf(c.base) ? ` С ${dm(tempoOf(c.base).from)} — медленный темп 3–2 (бережём колени): вес ниже примерно на четверть, это не откат. План считается от прежних весов × 0,75, пока нет записей в новом темпе.` : ''}</p>` + tableHtml(['Дата', 'Фаза', 'Факт', 'Объём', 'План', 'План: подходы'], tableRows));
+    p2.insertAdjacentHTML('beforeend', `<p class="note">Пунктир — план (тем же цветом, что и факт): что приложение предлагало на прошедшие тренировки и что предложит на ближайшие микроциклы (от твоего факта). ${c.bw ? 'В объём подтягиваний входит сохранённый вес тела. ' : ''}${c.split ? 'Диапазоны 6–8 и 10–12 — отдельные линии факта.' : ''}${tempoOf(c.base) ? ` С ${dm(tempoOf(c.base).from)} — медленный темп 3–2 (бережём колени): вес ниже примерно на четверть, это не откат. План считается от прежних весов × 0,75, пока нет записей в новом темпе.` : ''}</p>` + tableHtml(['Дата', 'Фаза', 'Факт', 'Объём', 'План', 'План: подходы'], tableRows));
   } else p2.insertAdjacentHTML('beforeend', `<p class="empty">По этому упражнению за период записей нет.</p>`);
   // the exercise view goes first: it answers "how will I progress in this lift"
   main.insertBefore(p2, p1);
 
-  /* nutrition */
-  const nut = state.nutr.filter(n => inP(n) && !n.unreadable && n.kcal != null);
-  const p3 = document.createElement('div'); p3.className = 'panel';
-  const avg = k => { const xs = nut.map(n => n[k]).filter(v => v != null); return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null; };
-  const aK = avg('kcal');
-  p3.innerHTML = `<h3>Питание</h3><p class="note">По разобранным отчётам из вкладки «Питание». Среднее считается по дням, за которые есть отчёт.</p>
-    <div class="stats"><div class="stat"><small>Средняя калорийность</small><b>${aK != null ? fmtN(aK) : '—'}</b><small>ккал/день · цель ~2670</small></div>
-    <div class="stat"><small>Среднее Б / Ж / У, г</small><b>${aK != null ? `${fmtN(avg('protein') || 0)} / ${fmtN(avg('fat') || 0)} / ${fmtN(avg('carbs') || 0)}` : '—'}</b><small>цель 230 / 45–55 / 160–240</small></div></div>`;
-  if (nut.length){
-    // weekly average kcal (daily columns on the week view)
-    const kb = (P.days <= 7 ? P.buckets : (() => { const w = []; for (let t = monday(new Date(P.startT)); +t < P.endT; t.setDate(t.getDate() + 7)){ const t1 = new Date(t); t1.setDate(t.getDate() + 7); w.push({t0: +t, t1: +t1}); } return w; })())
-      .map(b => { const ns = nut.filter(n => inBucket(b, n.date)); return {...b, n: ns.length, v: ns.length ? ns.reduce((a, n) => a + n.kcal, 0) / ns.length : null}; });
-    p3.insertAdjacentHTML('beforeend', `<p class="note" style="color:var(--fg);font-weight:600">${P.days <= 7 ? 'Калории по дням' : 'Средняя калорийность за неделю'}</p>`);
-    if (P.days <= 7) p3.appendChild(buildChart({kind:'col', title:'Калории', width, x0, x1, xticks: xt, ref:{v:2670, label:'цель'}, buckets: kb.map(b => ({...b, vals:[b.v || 0], label: bucketLabel(b, false)})), series:[{name:'ккал', color:'--s1'}], fmtY: fmtN, fmtV: v => fmtN(v) + ' ккал'}));
-    else p3.appendChild(buildChart({kind:'line', title:'Средняя калорийность за неделю', width, x0, x1, xticks: xt, ref:{v:2670, label:'цель'}, lines:[{name:'в среднем за день', color:'--s1', pts: kb.filter(b => b.v != null).map(b => ({t: (b.t0 + b.t1) / 2, v: b.v, label: `Неделя ${bucketLabel(b, true)}`, sub: `отчётов: ${b.n}`}))}], fmtY: fmtN, fmtV: v => fmtN(v) + ' ккал'}));
-    // macros, stacked grams
-    const mser = [{name:'белок', color:'--s1', k:'protein'}, {name:'жиры', color:'--s2', k:'fat'}, {name:'углеводы', color:'--s3', k:'carbs'}];
-    const mb = P.buckets.map(b => { const ns = nut.filter(n => inBucket(b, n.date)); const av = k => ns.length ? ns.reduce((a, n) => a + (n[k] || 0), 0) / ns.length : 0; return {...b, vals: mser.map(m => av(m.k)), label: bucketLabel(b, weekly) + (weekly && ns.length ? ` · ${ns.length} дн.` : ''), sub: ns.length ? `${fmtN(ns.reduce((a, n) => a + n.kcal, 0) / ns.length)} ккал${weekly ? ' в среднем' : ''}` : ''}; });
-    p3.insertAdjacentHTML('beforeend', `<p class="note" style="color:var(--fg);font-weight:600">Белки, жиры, углеводы${weekly ? ' — в среднем за день по неделям' : ' по дням'}, г</p>` + keysHtml(mser, false));
-    p3.appendChild(buildChart({kind:'col', stacked:true, title:'БЖУ', width, x0, x1, xticks: xt, buckets: mb, series: mser, fmtY: fmtN, fmtV: v => fmtN(v) + ' г'}));
-    p3.insertAdjacentHTML('beforeend', tableHtml(['Дата', 'ккал', 'Б', 'Ж', 'У'], nut.map(n => [dm(n.date), fmtN(n.kcal), n.protein != null ? fmtN(n.protein) : '—', n.fat != null ? fmtN(n.fat) : '—', n.carbs != null ? fmtN(n.carbs) : '—'])));
-  } else p3.insertAdjacentHTML('beforeend', `<p class="empty">За этот период разобранных отчётов нет. Загрузи скриншот или PDF во вкладке «Питание».</p>`);
-  main.appendChild(p3);
 }
 let resizeT; window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (state.tab === 'stats') render(); }, 200); });
 
@@ -2618,7 +2592,7 @@ function renderRules(main){
   <div class="panel"><h3>Микроцикл</h3><ul>
     <li>5 тренировочных дней за 7–9 календарных, по порядку: 1 → 2 → 3 → 4 → 5. Каждая группа мышц — дважды за микроцикл.</li>
     <li>Страница сама предлагает следующий день после последнего записанного и сама ставит номер микроцикла. Поправить можно кнопками − / +.</li>
-    <li><b>Многосуставные чередуются по неделям:</b> силовая — 6–8 повторов с большим весом (болгарские, жимы на грудь, тяги, подтягивания, брусья), многоповторная — 10–12 (подтягивания 8–12). Маятник и гакк пока не чередуются — см. ниже. Усилие одинаковое, меняются вес и повторы. Ноги (болгарские): порядок недель силовая → многоповторная → многоповторная → силовая. Грудь, спина и трицепс с микроцикла 6 чередуют недели внутри своей волны: пик — всегда силовая, перед ним многоповторная и так далее, разгрузка — многоповторная; поэтому в одном дне неделя может быть смешанной. Вес на 6–8 и на 10–12 следует за твоей силой: если другая неделя показала тебя сильнее (больше чем на 3% по Эпли), веса пересчитываются от неё — с запасом в 2 повтора сверх программы (формула между диапазонами — оценка; лучше легче и выполнить, чем тяжелее и не сделать), и прогрессия идёт дальше уже от них. Для подтягиваний и брусьев в расчёт входит вес тела из вкладки «Вес и талия»: между замерами он меняется плавно, поэтому вес стоит вносить хотя бы раз в неделю. Изоляция не чередуется: сгибания ног всегда 10–15, жим ногами-добивка 12–15, икры 10–15. Какая сейчас неделя — в заголовке дня. Номер микроцикла ставится сам: день, уже сделанный в этом микроцикле, открывается в следующем.</li>
+    <li><b>Многосуставные чередуются по неделям:</b> силовая — 6–8 повторов с большим весом (болгарские, жимы на грудь, тяги, подтягивания, брусья), многоповторная — 10–12 (подтягивания 8–12). Маятник и гакк пока не чередуются — см. ниже. Усилие одинаковое, меняются вес и повторы. Ноги (болгарские): порядок недель силовая → многоповторная → многоповторная → силовая. Грудь, спина и трицепс с микроцикла 6 чередуют недели внутри своей волны: пик — всегда силовая, перед ним многоповторная и так далее, разгрузка — многоповторная; поэтому в одном дне неделя может быть смешанной. Вес на 6–8 и на 10–12 следует за твоей силой: если другая неделя показала тебя сильнее (больше чем на 3% по Эпли), веса пересчитываются от неё — с запасом в 2 повтора сверх программы (формула между диапазонами — оценка; лучше легче и выполнить, чем тяжелее и не сделать), и прогрессия идёт дальше уже от них. Для подтягиваний и брусьев в расчёт входит последний сохранённый вес тела. Изоляция не чередуется: сгибания ног всегда 10–15, жим ногами-добивка 12–15, икры 10–15. Какая сейчас неделя — в заголовке дня. Номер микроцикла ставится сам: день, уже сделанный в этом микроцикле, открывается в следующем.</li>
     <li><b>Квадрицепс бережём (колени, с 26.10):</b> гакк с 05.11 в обычном темпе, всегда 15–20 (в темпе 3–2 было некомфортно), последний подход можно в отказ. Присед-маятник с 03.11 снова в обычном темпе (в темпе 3–2 не выдерживала поясница), всегда 12–15: план считает от обычных подходов, медленные подходы 26.10–02.11 в расчёт не идут. Разгибания ног убраны с 29.10 (отзывались в коленях): в дне 1 вместо них жим ногами 12–15 после маятника, без разгрузочных недель. Болгарские — пока в обычном темпе. Боль в колене (не жжение мышцы) — подход останавливаем.</li>
     <li><b>Волны по группам мышц.</b> Каждая группа идёт своей волной: несколько нагрузочных микроциклов с ростом тоннажа, пик и разгрузка (меньше подходов, вес −10% от текущих, RIR 3). По умолчанию пик на 5-м микроцикле волны (≈ 5–6 недель), и пики разнесены: ноги выходят на пик, когда грудь и спина в начале волны. «Рост» — на сколько процентов каждый следующий пик выше прошлого (по умолчанию 5%), новая волна стартует на 10% легче своего пика. Длину волны и процент роста меняешь на вкладке «План» — для группы или отдельного упражнения; веса пересчитываются сразу.</li><li><b>Автокорректировка.</b> С 3-го микроцикла волны приложение сравнивает факт с планом по каждой группе. Если два микроцикла подряд ниже плана больше чем на 5%, оно предложит снизить объём всей волны (веса и повторы до пика пересчитаются от твоего уровня) или процент роста; если отстают несколько групп — одной кнопкой для всех. Если идёшь выше плана — предложит поднять рост.</li>
   </ul></div>
