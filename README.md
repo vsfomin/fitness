@@ -18,20 +18,19 @@ docker compose up -d --build app
 
 ## Доступ с телефона
 
-Запустить Cloudflare Tunnel:
+Постоянный HTTPS-адрес: **https://rosy-river-0106.a.tuna.free**. Открыть его в Safari на iPhone, нажать «Поделиться» → «На экран “Домой”». При первом открытии Tuna может один раз показать страницу подтверждения с кнопкой «Посетить».
+
+Туннель работает как пользовательская служба macOS `fitness`, запускается после входа в систему и не зависит от открытого терминала. Mac должен быть включён и не спать, Docker и контейнер приложения должны работать.
 
 ```bash
-cloudflared tunnel --no-autoupdate --protocol quic --url http://127.0.0.1:18080
+tuna service status --name=fitness
+tuna service logs --name=fitness -n 100
+tuna service restart --name=fitness
+tuna service stop --name=fitness
+tuna service start --name=fitness
 ```
 
-В логе появится адрес `https://….trycloudflare.com`. Открыть его на телефоне и добавить на домашний экран. Quick Tunnel предназначен для личного использования: адрес меняется после перезапуска, а приложение доступно только пока работают Mac и контейнер.
-
-Альтернатива без установленного `cloudflared`:
-
-```bash
-docker compose up -d tunnel
-docker compose logs tunnel
-```
+Служба создана командой `tuna service install --name=fitness -- tuna http 18080 --subdomain=rosy-river-0106`. Это бесплатный постоянный поддомен, уже привязанный к аккаунту; произвольное имя на бесплатном тарифе недоступно.
 
 ## Облачная копия
 
