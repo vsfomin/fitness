@@ -2,6 +2,7 @@ const http = require('node:http');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const fs = require('node:fs/promises');
+const zlib = require('node:zlib');
 
 const PORT = Number(process.env.PORT || 8080);
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
@@ -12,10 +13,16 @@ const COLLECTIONS = new Set(['sessions', 'settings', 'body', 'nutrition', 'notes
 const clients = new Set();
 let writeChain = Promise.resolve();
 
+function compressedBody(request, body) {
+  if (body.length < 1024 || !/\bgzip\b/.test(request.headers['accept-encoding'] || '')) return {body, headers: {}};
+  return {body: zlib.gzipSync(body), headers: {'Content-Encoding': 'gzip', 'Vary': 'Accept-Encoding'}};
+}
+
 function json(response, status, value) {
-  const body = JSON.stringify(value);
-  response.writeHead(status, {'Content-Type': 'application/json; charset=utf-8', 'Content-Length': Buffer.byteLength(body), 'Cache-Control': 'no-store'});
-  response.end(body);
+  const body = Buffer.from(JSON.stringify(value));
+  const compressed = compressedBody(response.req, body);
+  response.writeHead(status, {'Content-Type': 'application/json; charset=utf-8', 'Content-Length': compressed.body.length, 'Cache-Control': 'no-store', ...compressed.headers});
+  response.end(compressed.body);
 }
 
 function validId(value) {
@@ -159,16 +166,18 @@ const server = http.createServer(async (request, response) => {
     const file = files[pathname];
     if (file && (request.method === 'GET' || request.method === 'HEAD')) {
       const body = await fs.readFile(path.join(__dirname, file[0]));
+      const compressed = compressedBody(request, body);
       response.writeHead(200, {
         'Content-Type': file[1],
-        'Content-Length': body.length,
+        'Content-Length': compressed.body.length,
         'Cache-Control': 'no-cache',
         'X-Content-Type-Options': 'nosniff',
         'X-Frame-Options': 'DENY',
         'Referrer-Policy': 'no-referrer',
         'X-Robots-Tag': 'noindex, nofollow',
+        ...compressed.headers,
       });
-      if (request.method === 'HEAD') response.end(); else response.end(body);
+      if (request.method === 'HEAD') response.end(); else response.end(compressed.body);
       return;
     }
 
