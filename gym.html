@@ -2606,13 +2606,6 @@ function renderRules(main){
     <li><b>Отдых:</b> базовые 2–3 мин, изоляция 60–90 с, пары 1a/1b — 90 с между подходами.</li>
     <li><b>Падают повторы</b> 2 тренировки подряд в нескольких упражнениях → +40–60 г углеводов в дни тренировок.</li>
   </ul></div>
-  <div class="panel"><h3>Питание, г — чистый набор (с 15.10)</h3>
-    <p class="note">День тренировки</p>
-    <div class="macros"><div><b>220</b><small>белок</small></div><div><b>55</b><small>жиры</small></div><div><b>355</b><small>углеводы</small></div><div><b>2795</b><small>ккал</small></div></div>
-    <p class="note">День отдыха</p>
-    <div class="macros"><div><b>220</b><small>белок</small></div><div><b>65</b><small>жиры</small></div><div><b>260</b><small>углеводы</small></div><div><b>2505</b><small>ккал</small></div></div>
-    <ul><li>60–70% углеводов — до и после тренировки.</li><li>Насыщенные жиры меньше 15 г; псиллиум 5–10 г; омега-3 2–3 г.</li><li>Креатин 5 г каждый день. Соль и воду не урезать.</li></ul>
-  </div>
   <div class="panel"><h3>Активность</h3><ul>
     <li>Шаги: 7–9 тыс. в день.</li><li>Кардио: 2–3 × 30 мин, пульс 110–130 — для сердца и липидов, на наборе тоже.</li>
   </ul></div>`);
@@ -2681,15 +2674,6 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) flush
 render();
 
 (async () => {
-  try { sample = window.claude && window.claude.use ? await window.claude.use('sample') : null; } catch { sample = null; }
-  if (sample){ try { imgLimits = (await sample.limits()).images || null; } catch { imgLimits = null; } }
-  if (state.tab === 'food') render();
-})();
-(async () => {
-  try { assets = window.claude && window.claude.use ? await window.claude.use('assets') : null; } catch { assets = null; }
-  if (state.tab === 'body') render();
-})();
-(async () => {
   try { db = window.claude && window.claude.use ? await window.claude.use('db') : null; } catch { db = null; }
   if (!db){ setStatus('сохранение недоступно', true); return; }
   setStatus('загружаю…');
@@ -2727,11 +2711,6 @@ render();
     state.names = d && d.names ? {...d.names} : {};
     if (!busy()) render();
   }, () => {});
-  db.doc('notes/main').onSnapshot(snap => {
-    state.notes = snap.exists ? snap.data() : null;
-    const ta = document.getElementById('notes');
-    if (ta && document.activeElement !== ta) ta.value = state.notes && state.notes.text || '';
-  }, () => {});
   db.doc('settings/growth').onSnapshot(snap => {
     const d = snap.exists ? snap.data() : null;
     state.growth = d && d.values ? {...d.values} : {}; state.dismiss = d && d.dismiss ? {...d.dismiss} : {}; state.sched = d && d.sched ? JSON.parse(JSON.stringify(d.sched)) : {}; state.scale = d && d.scale ? {...d.scale} : {};
@@ -2739,15 +2718,6 @@ render();
   }, () => {});
   db.collection('body').orderBy('date','desc').limit(400).onSnapshot(snap => {
     state.body = snap.docs.map(d => d.data());
-    if (state.tab === 'body' && !busy()) render();
-  }, () => setStatus('нет связи с хранилищем', true));
-  db.collection('photos').orderBy('date','desc').limit(500).onSnapshot(snap => {
-    state.photos = snap.docs.map(d => d.data()).filter(x => x && x.asset);
-    if (state.tab === 'body' && !busy() && !state.photoBusy) render();
-  }, () => {});
-  db.collection('nutrition').orderBy('date','desc').limit(400).onSnapshot(snap => {
-    state.nutr = snap.docs.map(d => d.data());
-    if (state.tab === 'food' && !busy() && !state.nBusy) render();
   }, () => setStatus('нет связи с хранилищем', true));
 })();
 </script>
