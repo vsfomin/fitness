@@ -13,9 +13,7 @@
       "d2_ohc",
       "d2_ic",
       "d2_rf",
-      "d2_db",
-      "umwrx1h0i4",
-      "umwrx1h0i4"
+      "d2_db"
     ],
     "3": [
       "d3_curl",
@@ -72,7 +70,8 @@
     },
     "umwrx1h0i4": {
       "base": "d1_pendx",
-      "day": "2"
+      "day": "2",
+      "off": true
     }
   },
   "hidden": {
